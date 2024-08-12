@@ -1,4 +1,5 @@
-#include <fstream>
+#include <chrono>
+#include <cstdio>
 #include <iostream>
 #include <random>
 #include <string>
@@ -31,6 +32,7 @@ double random_temperature() {
 }
 
 int main(int argc, char *argv[]) {
+    const auto start{std::chrono::steady_clock::now()};
     int n_stations = station_count_dist(gen);
     std::vector<std::string> stations;
     stations.reserve(n_stations);
@@ -43,9 +45,16 @@ int main(int argc, char *argv[]) {
     if (argc > 1) {
         n = std::stoi(argv[1]);
     }
-    std::ofstream out("measurements.txt");
+    FILE *fh = fopen("measurements.txt", "w");
 
     for (int i = 0; i < n; ++i) {
-        out << stations[station_idx_dist(gen)] << ";" << random_temperature() << "\n";
+        auto &station = stations[i%n_stations];
+        auto temperature = random_temperature();
+        fprintf(fh, "%s;%.3f\n", station.c_str(), temperature);
     }
+    fclose(fh);
+
+    const auto end{std::chrono::steady_clock::now()};
+    const std::chrono::duration<double> elapsed_seconds{end - start};
+    std::cout << "Generated " << n << " measurements in " << elapsed_seconds.count() << " seconds\n";
 }
