@@ -4,3 +4,4 @@ project(1brc)
 add_executable(create-sample src/create_sample.cpp
         src/time_me.h)
 add_executable(run src/run.cpp)
+add_executable(analyze src/analyze.c)
